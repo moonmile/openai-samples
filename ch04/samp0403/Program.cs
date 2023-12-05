@@ -1,20 +1,18 @@
 ﻿using Azure;
 using Azure.AI.OpenAI;
-using System;
-using System.Threading.Tasks;
 
+// Azure OpenAIサービスのAPIキー
+string apiKey = "a6eccd388fdf4358bb33b3b7568b487c"; 
+// Azure OpenAIサービスのエンドポイント
+string endpoint = "https://sample-moonmile-openai-jp.openai.azure.com/"; 
 
-string apiKey = "a6eccd388fdf4358bb33b3b7568b487c"; // Azure OpenAIサービスのAPIキー
-string endpoint = "https://sample-moonmile-openai-jp.openai.azure.com/"; // Azure OpenAIサービスのエンドポイント
-
-string theme = "光通信の安定的な接続について";
-string terms = "光通信の共有、NTT、ターミナルABC";
-string additionalSentence = "ターミナルABCは2025年のアップデートでより快適な回線速度を実現する予定です。";
+// ブログ記事のテーマ
+string blogTheme = "最新のテクノロジートレンド";
+// ブログ記事を生成するためのプロンプト
+string prompt = $"次のテーマに基づいて詳細なブログ記事を書いてください: '{blogTheme}'\n";
 
 var credential = new AzureKeyCredential(apiKey);
 var client = new OpenAIClient(new Uri(endpoint), credential);
-
-string prompt = $"主要なテーマ：{theme}\n専門用語：{terms}\n追加文書：{additionalSentence}\n\nブログ記事：\n";
 
 var options = new ChatCompletionsOptions
 {
