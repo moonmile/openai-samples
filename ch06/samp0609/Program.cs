@@ -14,7 +14,7 @@ string prompt = """
 
 var credential = new AzureKeyCredential(apiKey);
 var client = new OpenAIClient(new Uri(endpoint), credential);
-int maxTokens = 100 ;
+int maxTokens = 4000 ;
 
 Console.WriteLine("最大値の実験コード");
 
@@ -27,10 +27,14 @@ var options = new CompletionsOptions
 };
 
 
-Response<Completions> response = await client.GetCompletionsAsync(options);
-string result = response.Value.Choices[0].Text;
+var response = await client.GetCompletionsStreamingAsync(options);
 
-Console.WriteLine(prompt);
-Console.WriteLine("＜続き＞");
-Console.WriteLine(result);
+await foreach ( var it in response.EnumerateValues())
+{
+    if ( it.Choices.Count > 0 )
+    {
+        Console.Write(it.Choices[0].Text);
+    }
+}
+
 
