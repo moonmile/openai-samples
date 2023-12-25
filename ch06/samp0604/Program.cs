@@ -14,7 +14,7 @@ var client = new OpenAIClient(new Uri(endpoint), credential);
 
 
 Console.WriteLine("頻度のペナルティの実験コード");
-double frequency_penalty = -0.2 ;
+double frequency_penalty = 0.0 ;
 Console.WriteLine($"FrequencyPenalty: {frequency_penalty}");
 
 var options = new ChatCompletionsOptions

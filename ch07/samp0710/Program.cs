@@ -13,7 +13,7 @@ var client = new OpenAIClient(new Uri(endpoint), credential);
 Console.WriteLine("箇条書きから文章を生成するプロンプト");
 
 string prompt = """
-つぎの箇条書きをもとに400文字ぐらいの文章を書いてください。
+つぎの箇条書きをもとに800文字ぐらいの文章を書いてください。
 
 ・カレーのレシピ
 ・材料は、じゃがいもとにんじんとカレールーと豚肉

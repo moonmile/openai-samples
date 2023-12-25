@@ -5,19 +5,17 @@ import os
 import openai
 
 openai.api_type = "azure"
-openai.api_base = "https://sample-moonmile-openai-jp.openai.azure.com/"
+openai.api_base = "https://sample-moonmile-openai.openai.azure.com/"
 openai.api_version = "2023-07-01-preview"
-openai.api_key = "a6eccd388fdf4358bb33b3b7568b487c"
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 message_text = [
-    {"role":"user","content":"次の箇条書きを文章に直してください。"},
-    {"role":"user","content":"- 猫は可愛い。"},
-    {"role":"user","content":"- 猫は気まぐれである。"},
-    {"role":"user","content":"- ロボットは猫になることができる。"},
+  {"role":"system","content":"You are an AI assistant that helps people find information."},
+  {"role":"user","content":"Azure OpenAIについて詳しく説明してください。"},
 ]
 
-response = openai.ChatCompletion.create(
-  engine="model-x",
+completion = openai.ChatCompletion.create(
+  engine="test-x",
   messages = message_text,
   temperature=0.7,
   max_tokens=800,
@@ -27,5 +25,6 @@ response = openai.ChatCompletion.create(
   stop=None
 )
 
+
 # 応答を表示します。
-print(response.choices[0].message['content'])
+print(completion.choices[0].message['content'])
