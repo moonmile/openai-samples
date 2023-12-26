@@ -10,10 +10,10 @@ string endpoint = "https://sample-moonmile-openai-jp.openai.azure.com/";
 var credential = new AzureKeyCredential(apiKey);
 var client = new OpenAIClient(new Uri(endpoint), credential);
 
-Console.WriteLine("文章を要約するプロンプト");
+Console.WriteLine("文章を箇条書きにするプロンプト");
 
 string prompt = """
-次の文章を100文字程度に要約してください。
+次の文章を要約して3つの箇条書きにしてください。
 
 ある日、豚肉と玉ねぎとじゃがいもは、おいしいカレーを作ることにしました。
 豚肉は元気いっぱいで、「わたしはカレーにピリッとした味を出すのが得意だよ！」と自慢しました。
@@ -28,7 +28,7 @@ string prompt = """
 その日の夕飯は、家族みんなで美味しいカレーを楽しみました。
 豚肉も玉ねぎもじゃがいもも、みんなのお腹を満たすおいしいカレーを作ることができて、とっても嬉しかったのです。
 
-要約：
+箇条書き：
 """;
 
 var options = new ChatCompletionsOptions

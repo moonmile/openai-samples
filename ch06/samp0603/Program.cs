@@ -2,38 +2,39 @@
 using Azure.AI.OpenAI;
 
 // Azure OpenAIサービスのAPIキー
-string apiKey = "a6eccd388fdf4358bb33b3b7568b487c"; 
+string apiKey = "e2e779b144e440a58d0a831f6821bb9d"; 
 // Azure OpenAIサービスのエンドポイント
-string endpoint = "https://sample-moonmile-openai-jp.openai.azure.com/"; 
+string endpoint = "https://sample-moonmile-openai.openai.azure.com/"; 
 
-// 質問のプロンプト
+// 記事を生成するためのプロンプト
 string prompt = """
-    次の文章の続きを、想像で作ってください。
+量子コンピュータについて詳しく教えてください。
 
-    深海の探索中、突然珍しい生物に遭遇した。その生物は・・・
 """;
 
 var credential = new AzureKeyCredential(apiKey);
 var client = new OpenAIClient(new Uri(endpoint), credential);
+int maxTokens = 4000 ;
 
+Console.WriteLine("最大値の実験コード");
 
-Console.WriteLine("上位Pの実験コード");
-double top_p = 0.8 ;
-Console.WriteLine($"Top P: {top_p}");
-
-var options = new ChatCompletionsOptions
+var options = new CompletionsOptions
 {
-    Messages =
-    {
-      new ChatMessage(ChatRole.User, prompt),
-    },
+    Prompts = { prompt },
     DeploymentName = "model-x",
-    MaxTokens = 800,
-    NucleusSamplingFactor = (float)top_p,      // 上位Pを指定する
+    MaxTokens = maxTokens,
+    Temperature = (float)0.7,
 };
 
-Response<ChatCompletions> response = await client.GetChatCompletionsAsync(options);
-ChatCompletions res = response.Value;
-string result = res.Choices.First().Message.Content;
-Console.WriteLine(result);
+
+var response = await client.GetCompletionsStreamingAsync(options);
+
+await foreach ( var it in response.EnumerateValues())
+{
+    if ( it.Choices.Count > 0 )
+    {
+        Console.Write(it.Choices[0].Text);
+    }
+}
+
 

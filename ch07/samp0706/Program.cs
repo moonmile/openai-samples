@@ -10,12 +10,12 @@ string endpoint = "https://sample-moonmile-openai-jp.openai.azure.com/";
 var credential = new AzureKeyCredential(apiKey);
 var client = new OpenAIClient(new Uri(endpoint), credential);
 
-Console.WriteLine("ブログを生成するプロンプト");
+Console.WriteLine("物語を生成するプロンプト");
 string prompt = """
-テーマ：カレーの作り方について
-
-このテーマを用いて、400文字程度のブログ記事を書いてください。
+カレーをテーマにして400文字程度で物語を作って下さい。
+登場人物は、豚肉と玉ねぎとじゃがいもです。
 口調は小学生にでもわかるように、やさしい言葉を使ってください。
+
 
 文章：
 """;

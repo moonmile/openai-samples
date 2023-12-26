@@ -2,34 +2,35 @@
 using Azure.AI.OpenAI;
 
 // Azure OpenAIサービスのAPIキー
-string apiKey = "a6eccd388fdf4358bb33b3b7568b487c"; 
+string apiKey = "e2e779b144e440a58d0a831f6821bb9d"; 
 // Azure OpenAIサービスのエンドポイント
-string endpoint = "https://sample-moonmile-openai-jp.openai.azure.com/"; 
+string endpoint = "https://sample-moonmile-openai.openai.azure.com/"; 
 
-// 質問のプロンプト
-// string prompt = "宇宙について面白い事実を教えてください。\n" ;
-string prompt = "猫とロボットと人工知能で、昔話を作ってください。\n";
+// 記事を生成するためのプロンプト
+string prompt = """
+量子コンピュータについて詳しく教えてください。
+
+""";
+
 var credential = new AzureKeyCredential(apiKey);
 var client = new OpenAIClient(new Uri(endpoint), credential);
+int maxTokens = 100 ;
 
+Console.WriteLine("最大値の実験コード");
 
-Console.WriteLine("温度の実験コード");
-double temperature = 0.8 ;
-Console.WriteLine($"Temperature: {temperature}");
-
-var options = new ChatCompletionsOptions
+var options = new CompletionsOptions
 {
-    Messages =
-    {
-      new ChatMessage(ChatRole.User, prompt),
-    },
+    Prompts = { prompt },
     DeploymentName = "model-x",
-    MaxTokens = 800,
-    Temperature = (float)temperature,      // 温度を指定する
+    MaxTokens = maxTokens,
+    Temperature = (float)0.7,
 };
 
-Response<ChatCompletions> response = await client.GetChatCompletionsAsync(options);
-ChatCompletions res = response.Value;
-string result = res.Choices.First().Message.Content;
+
+Response<Completions> response = await client.GetCompletionsAsync(options);
+string result = response.Value.Choices[0].Text;
+
+Console.WriteLine(prompt);
+Console.WriteLine("＜続き＞");
 Console.WriteLine(result);
 

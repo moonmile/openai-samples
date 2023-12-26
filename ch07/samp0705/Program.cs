@@ -2,38 +2,36 @@
 using Azure.AI.OpenAI;
 
 // Azure OpenAIサービスのAPIキー
-string apiKey = "e2e779b144e440a58d0a831f6821bb9d"; 
+string apiKey = "a6eccd388fdf4358bb33b3b7568b487c"; 
 // Azure OpenAIサービスのエンドポイント
-string endpoint = "https://sample-moonmile-openai.openai.azure.com/"; 
+string endpoint = "https://sample-moonmile-openai-jp.openai.azure.com/"; 
 
 
 var credential = new AzureKeyCredential(apiKey);
 var client = new OpenAIClient(new Uri(endpoint), credential);
 
+Console.WriteLine("ブログを生成するプロンプト");
 string prompt = """
-次の箇条書きを200文字程度の文章に書き換えてください。
+テーマ：カレーの作り方について
 
-- 猫は可愛い。
-- 猫は気まぐれである。
-- ロボットは猫になることができる。
+このテーマを用いて、400文字程度のブログ記事を書いてください。
+口調は小学生にでもわかるように、やさしい言葉を使ってください。
 
 文章：
 """;
 
-Console.WriteLine("コンソールで実行（入力候補形式）");
-
-
-var options = new CompletionsOptions
+var options = new ChatCompletionsOptions
 {
-    Prompts = { prompt },
+    Messages =
+    {
+      new ChatMessage(ChatRole.User, prompt ),
+    },
     DeploymentName = "model-x",
     MaxTokens = 800,
     Temperature = (float)0.7,
 };
 
-
-Response<Completions> response = await client.GetCompletionsAsync(options);
-string result = response.Value.Choices[0].Text;
+Response<ChatCompletions> response = await client.GetChatCompletionsAsync(options);
+ChatCompletions res = response.Value;
+string result = res.Choices.First().Message.Content;
 Console.WriteLine(result);
-
-

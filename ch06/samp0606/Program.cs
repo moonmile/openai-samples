@@ -6,25 +6,26 @@ string apiKey = "a6eccd388fdf4358bb33b3b7568b487c";
 // Azure OpenAIサービスのエンドポイント
 string endpoint = "https://sample-moonmile-openai-jp.openai.azure.com/"; 
 
+// 質問のプロンプト
+string prompt = "猫とロボットと人工知能で、昔話を作ってください。\n";
 
 var credential = new AzureKeyCredential(apiKey);
 var client = new OpenAIClient(new Uri(endpoint), credential);
 
-Console.WriteLine("ロールの実験コード");
 
+Console.WriteLine("頻度のペナルティの実験コード");
+double frequency_penalty = 0.0 ;
+Console.WriteLine($"FrequencyPenalty: {frequency_penalty}");
 
 var options = new ChatCompletionsOptions
 {
     Messages =
     {
-      new ChatMessage(ChatRole.User, "次の箇条書きを文章に直してください。"),
-      new ChatMessage(ChatRole.User, "- 猫は可愛い。"),
-      new ChatMessage(ChatRole.User, "- 猫は気まぐれである。"),
-      new ChatMessage(ChatRole.User, "- ロボットは猫になることができる。"),
+      new ChatMessage(ChatRole.User, prompt),
     },
     DeploymentName = "model-x",
     MaxTokens = 800,
-    Temperature = (float)0.7,
+    FrequencyPenalty = (float)frequency_penalty,      // 頻度のペナルティ
 };
 
 Response<ChatCompletions> response = await client.GetChatCompletionsAsync(options);
