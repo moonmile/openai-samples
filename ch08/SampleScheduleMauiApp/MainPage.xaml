@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SampleScheduleMauiApp.MainPage">
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60" />
@@ -18,6 +17,5 @@
         <Label Text="{Binding Output}" Grid.Row="2" />
         <Button Text="送信" Grid.Column="1" Command="{Binding SendCommand}" Margin="2"/>
         <Button Text="保存" Grid.Column="1" Grid.Row="1" Clicked="clickSave" Margin="2"/>
-
     </Grid>
 </ContentPage>

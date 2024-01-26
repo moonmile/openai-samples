@@ -1,11 +1,12 @@
 ﻿@model SampleScheduleMvc.Models.PromptViewModel
 
-
 @{
     ViewData["Title"] = "Home Page";
+
+    var output = Model.Output.Replace("\n", "<br />");
 }
 
-<div class="text-center">
+<div class="text-left">
     <h1 class="display-4">AIスケジューラー</h1>
 
     <div class="row">
@@ -15,14 +16,16 @@
                     <label asp-for="Input" class="control-label"></label>
                     <input asp-for="Input" class="form-control" />
                 </div>
+                <div></div>
                 <div class="form-group">
                     <input type="submit" value="送信" class="btn btn-primary" />
                 </div>
             </form>
         </div>
     </div>
+    <hr />
     <div>
-        @Model.Output
+        @Html.Raw(output)
     </div>
 
 

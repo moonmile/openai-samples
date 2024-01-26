@@ -1,5 +1,6 @@
 ﻿using Azure.AI.OpenAI;
 using Azure;
+using System.Text.Json;
 
 namespace SampleScheduleMvc.Models
 {
@@ -36,8 +37,6 @@ namespace SampleScheduleMvc.Models
         }
 
         private ChatCompletionsOptions _options;
-        private List<ChatRequestMessage> _messages = new List<ChatRequestMessage>();
-
 
         /// <summary>
         /// 最初のプロンプトを送信する
@@ -98,5 +97,79 @@ namespace SampleScheduleMvc.Models
             var msg = (_options.Messages.Last() as ChatRequestAssistantMessage)?.Content;
         }
 
+        /// <summary>
+        /// シリアライズ
+        /// </summary>  
+        public string Serialize()
+        {
+            var messages = new List<ChatMessage>();
+            foreach (var m in _options.Messages)
+            {
+                if (m is ChatRequestUserMessage)
+                {
+                    messages.Add(new ChatMessage()
+                    {
+                        Role = "user",
+                        Content = (m as ChatRequestUserMessage).Content,
+                    });
+                }
+                else if (m is ChatRequestAssistantMessage)
+                {
+                    messages.Add(new ChatMessage()
+                    {
+                        Role = "assistant",
+                        Content = (m as ChatRequestAssistantMessage).Content,
+                    });
+                }
+                else if (m is ChatRequestSystemMessage)
+                {
+                    messages.Add(new ChatMessage()
+                    {
+                        Role = "system",
+                        Content = (m as ChatRequestSystemMessage).Content,
+                    });
+                }
+            }
+            var json =  JsonSerializer.Serialize(messages);
+            return json;
+        }
+        /// <summary>
+        /// デシリアライズ
+        /// </summary>
+        /// <param name="json"></param>
+        public void Deserialize(string json)
+        {
+            var messages = JsonSerializer.Deserialize<List<ChatMessage>>(json);
+            _options = new ChatCompletionsOptions()
+            {
+                DeploymentName = "test-x",
+                Temperature = (float)0.5,
+                MaxTokens = 800,
+                NucleusSamplingFactor = (float)0.95,
+                FrequencyPenalty = 0,
+                PresencePenalty = 0,
+            };
+            foreach ( var it in messages)
+            {
+                if (it.Role == "user")
+                {
+                    _options.Messages.Add(new ChatRequestUserMessage(it.Content));
+                }
+                else if (it.Role == "assistant")
+                {
+                    _options.Messages.Add(new ChatRequestAssistantMessage(it.Content));
+                }
+                else if (it.Role == "system")
+                {
+                    _options.Messages.Add(new ChatRequestSystemMessage(it.Content));
+                }
+            }
+        }
+
+        public class ChatMessage
+        {
+            public string Role { get; set; } = "";
+            public string Content { get; set; } = "";
+        }
     }
 }

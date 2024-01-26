@@ -19,8 +19,8 @@
 
         <TextBox Text="{Binding Input}" />
         <TextBlock Text="{Binding Output}" Grid.Row="2" TextWrapping="Wrap" />
-        <Button Content="送信" Grid.Column="1" Command="{Binding SendCommand}"/>
-        <Button Content="保存" Grid.Column="1" Grid.Row="1" Command="{Binding SaveCommand}"/>
+        <Button Content="送信" Grid.Column="1" Command="{Binding SendCommand}" Margin="2"/>
+        <Button Content="保存" Grid.Column="1" Grid.Row="1" Command="{Binding SaveCommand}" Margin="2"/>
 
     </Grid>
 </Window>
