@@ -2,45 +2,8 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>AIスケジューラー</h1>
+<h1>Hello, world!</h1>
 
-<div class="text-left">
-    <div class="row">
-        <div class="col-md-12">
-            <InputText @bind-Value="vm.Input" class="col-md-6"  />
-            <button class="btn btn-primary" @onclick="clickSend">送信</button>
-            <hr />
-            <div>
-                @((MarkupString)Output)
-            </div>
-        </div>
-    </div>
-</div>
+Welcome to your new app.
 
-
-
-@code {
-    private PromptViewModel vm = new PromptViewModel();
-    private string Output {
-        get
-        {
-            return vm.Output.Replace("\n", "<br />");
-        }
-    }
-
-    protected async override Task OnInitializedAsync()
-    {
-        await vm.SendInit();
-        StateHasChanged();
-    }
-
-    /// <summary>
-    /// プロンプトを送信する
-    /// </summary>
-    private async void clickSend()
-    {
-        await vm.Send();
-        vm.Input = "";
-        StateHasChanged();
-    }
-}
+<SurveyPrompt Title="How is Blazor working for you?" />

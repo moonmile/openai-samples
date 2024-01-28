@@ -4,6 +4,7 @@ using Azure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
 
 namespace SampleScheduleFunctionApp
 {
@@ -17,24 +18,39 @@ namespace SampleScheduleFunctionApp
         }
 
         [Function("CallSchedule")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData req)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
+            // メッセージ配列を取得する
+            var messages = await req.ReadFromJsonAsync<List<ChatMessage>>();
+            if ( messages == null )
+            {
+                return req.CreateResponse(HttpStatusCode.BadRequest);
+            }   
+            // OpenAIのAPIを呼び出す
+            var vm = new PromptViewModel();
+            vm.SetMessage(messages);
+            var output = await vm.Send();
 
-            var vm = new ViewModel();
-            string output = await vm.SendInit();
-
+            // レスポンスを返す
             var response = req.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
-
-            response.WriteString( output );
-
+            response.WriteString(output);
             return response;
         }
     }
 
+    /// <summary>
+    /// チャットメッセージクラス
+    /// </summary>
+    public class ChatMessage
+    {
+        public string Role { get; set; } = "";
+        public string Content { get; set; } = "";
+    }
 
-    public class ViewModel 
+
+    public class PromptViewModel
     {
         private const string _apikey = "e448825271654bcf9bfa65e073636924";
         private const string _url = "https://sample-moonmile-openai-canada.openai.azure.com/";
@@ -43,25 +59,23 @@ namespace SampleScheduleFunctionApp
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public ViewModel()
+        public PromptViewModel()
         {
             _client = new OpenAIClient(
                 new Uri(_url),
                 new AzureKeyCredential(_apikey));
         }
 
-        public string Input { get; set; }
-        public string Output { get; set; }
-
         private ChatCompletionsOptions _options;
-        private List<ChatRequestMessage> _messages = new List<ChatRequestMessage>();
 
 
         /// <summary>
-        /// 最初のプロンプトを送信する
+        /// ChatMessage配列を設定する
         /// </summary>
-        public async Task<string> SendInit()
+        /// <param name="chatMessages"></param>
+        public void SetMessage(List<ChatMessage> chatMessages )
         {
+            // オプションを設定する
             _options = new ChatCompletionsOptions()
             {
                 DeploymentName = "test-x",
@@ -71,29 +85,22 @@ namespace SampleScheduleFunctionApp
                 FrequencyPenalty = 0,
                 PresencePenalty = 0,
             };
-            _options.Messages.Add(new ChatRequestSystemMessage("""
-                箇条書きで予定表を作ってください。
-
-                予定表のフォーマット：
-                - [日付] [内容]
-
-                現在の予定は以下の通りです。
-                [予定表はここから]
-                - 4/1 入社式
-                - 4/2 新人歓迎会
-                - 4/3 プログラム研修１
-                - 4/4 プログラム研修２
-                [予定表はここまで]
-
-                予定表を表示してください。
-
-                """));
-
-            var responseWithoutStream = await _client.GetChatCompletionsAsync(_options);
-            var response = responseWithoutStream.Value;
-            this.Output = response.Choices.First().Message.Content;
-            _options.Messages.Add(new ChatRequestAssistantMessage(Output));
-            return this.Output;
+            // メッセージを設定する
+            foreach ( var chat in chatMessages )
+            {
+                switch ( chat.Role )
+                {
+                    case "user":
+                        _options.Messages.Add(new ChatRequestUserMessage(chat.Content));
+                        break;
+                    case "assistant":
+                        _options.Messages.Add(new ChatRequestAssistantMessage(chat.Content));
+                        break;
+                    case "system":
+                        _options.Messages.Add(new ChatRequestSystemMessage(chat.Content));
+                        break;
+                }
+            }   
         }
 
         /// <summary>
@@ -101,12 +108,10 @@ namespace SampleScheduleFunctionApp
         /// </summary>
         public async Task<string> Send()
         {
-            _options.Messages.Add(new ChatRequestUserMessage(Input));
             var responseWithoutStream = await _client.GetChatCompletionsAsync(_options);
             var response = responseWithoutStream.Value;
-            this.Output = response.Choices.First().Message.Content;
-            _options.Messages.Add(new ChatRequestAssistantMessage(Output));
-            return this.Output;
+            var output = response.Choices.First().Message.Content;
+            return output;
         }
     }
 }

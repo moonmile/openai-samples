@@ -7,12 +7,12 @@
             <button class="btn btn-primary" @click="clickHandler">送信</button>
         </div>
         <hr />
-        <p v-html="output"></p>
+        <p class="output" v-html="output"></p>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { 
     OpenAIClient, AzureKeyCredential, 
     type ChatRequestMessage } from '@azure/openai' 
@@ -40,7 +40,6 @@ const messages = reactive([
 
 const apikey = "e2e779b144e440a58d0a831f6821bb9d";
 const url = "https://sample-moonmile-openai.openai.azure.com/";
-
 const client = new OpenAIClient( url, new AzureKeyCredential( apikey ));
 
 async function queryGPT4() {
@@ -55,8 +54,26 @@ async function queryGPT4() {
         "frequencyPenalty": 0,
         "presencePenalty": 0
     });
-    return response?.choices[0]?.message?.content ?? "エラーが発生しました。";
+    return response.choices[0].message?.content
 }
+
+onMounted(async () => {
+    console.log("onMounted ");
+    var text = await queryGPT4();
+    output.value = text.replace(/\n/g, "<br />");
+    messages.push({ "role": "assistant", "content": text });
+    text = `
+現在の予定は以下の通りです。
+
+- 4/1 入社式
+- 4/2 新人歓迎会
+- 4/3 プログラム研修１
+- 4/4 プログラム研修２
+- 4/5 社内セキュリティ研修
+- 4/6 個人情報保護研修
+    `
+    output.value = text.replace(/\n/g, "<br />");
+})
 
 async function clickHandler() {
     console.log("clickHandler " + input.value);
@@ -65,5 +82,12 @@ async function clickHandler() {
     output.value = text.replace(/\n/g, "<br />");
     messages.push({"role": "assistant", "content": text});
 }
-
 </script>
+
+<style scoped>
+.output {
+    border: 1px solid #ccc;
+    padding: 2rem;
+    margin: 1rem 0;
+}
+</style>

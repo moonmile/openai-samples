@@ -1,0 +1,40 @@
+﻿@page "/schedule"
+<PageTitle>Schedule</PageTitle>
+<h1>AIスケジューラー</h1>
+<div>
+    <div class="input-group">
+        <InputText @bind-Value="vm.Input" class="form-control me-2" />
+        <button class="btn btn-primary" @onclick="clickSend">送信</button>
+    </div>
+    <hr />
+    <div>
+        @((MarkupString)Output)
+    </div>
+</div>
+
+
+@code {
+    private PromptViewModel vm = new PromptViewModel();
+    private string Output {
+        get
+        {
+            return vm.Output.Replace("\n", "<br />");
+        }
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await vm.SendInit();
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// プロンプトを送信する
+    /// </summary>
+    private async void clickSend()
+    {
+        await vm.Send();
+        vm.Input = "";
+        StateHasChanged();
+    }
+}

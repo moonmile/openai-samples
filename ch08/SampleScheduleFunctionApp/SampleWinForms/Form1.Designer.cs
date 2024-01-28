@@ -56,6 +56,7 @@
             buttonSend.TabIndex = 2;
             buttonSend.Text = "送信";
             buttonSend.UseVisualStyleBackColor = true;
+            buttonSend.Click += buttonSend_Click;
             // 
             // Form1
             // 
@@ -67,6 +68,7 @@
             Controls.Add(textInput);
             Name = "Form1";
             Text = "AIスケジューラー";
+            Load += Form1_Load;
             ResumeLayout(false);
             PerformLayout();
         }

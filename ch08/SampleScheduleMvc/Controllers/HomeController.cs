@@ -29,7 +29,7 @@ namespace SampleScheduleMvc.Controllers
             return View(vm);
         }
 
-        public async Task<IActionResult> Edit([Bind("Input,Output")] PromptViewModel vm )
+        public async Task<IActionResult> Edit([Bind("Input")] PromptViewModel vm )
         {
             // セッションからJSON型式で復元
             var json = HttpContext.Session.GetString("vm");

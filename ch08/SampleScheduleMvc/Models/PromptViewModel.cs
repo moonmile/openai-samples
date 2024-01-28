@@ -74,6 +74,7 @@ namespace SampleScheduleMvc.Models
             var response = responseWithoutStream.Value;
             this.Output = response.Choices.First().Message.Content;
             _options.Messages.Add(new ChatRequestAssistantMessage(Output));
+
         }
 
         /// <summary>
@@ -88,14 +89,6 @@ namespace SampleScheduleMvc.Models
             _options.Messages.Add(new ChatRequestAssistantMessage(Output));
         }
 
-        /// <summary>
-        /// 最後の回答をストレージに保存
-        /// </summary>
-        public void Save()
-        {
-            // ここでは簡便のためメッセージとして表示させる
-            var msg = (_options.Messages.Last() as ChatRequestAssistantMessage)?.Content;
-        }
 
         /// <summary>
         /// シリアライズ

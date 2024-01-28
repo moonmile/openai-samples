@@ -2,6 +2,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+// セッション管理の追加
 builder.Services.AddSession();
 
 var app = builder.Build();
@@ -20,6 +21,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+// セッション管理の追加
 app.UseSession();
 
 app.MapControllerRoute(
