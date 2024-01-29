@@ -79,6 +79,21 @@ namespace SampleWinForms
             var result = await response.Content.ReadAsStringAsync();
             textOutput.Text = result.Replace("\n", "\r\n");
             messages.Add(new ChatMessage() { Role = "assistant", Content = result });
+
+
+            textInput.Text = "予定表を表示して。";
+            textOutput.Text = """
+                現在の予定は以下の通りです。
+                
+                - 4/1 入社式
+                - 4/2 新人歓迎会
+                - 4/3 プログラム研修１
+                - 4/4 プログラム研修２
+                - 4/5 社内セキュリティ研修
+                - 4/6 個人情報保護研修
+                
+                """;
+
         }
     }
 }

@@ -20,7 +20,7 @@ namespace SampleScheduleFunctionApp
         [Function("CallSchedule")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            // _logger.LogInformation("C# HTTP trigger function processed a request.");
             // メッセージ配列を取得する
             var messages = await req.ReadFromJsonAsync<List<ChatMessage>>();
             if ( messages == null )
