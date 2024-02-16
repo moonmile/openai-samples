@@ -81,7 +81,8 @@ namespace SampleScheduleBlazor
         /// </summary>
         public async Task Send()
         {
-            _options.Messages.Add(new ChatRequestUserMessage(Input));
+            _options.Messages.Add(
+              new ChatRequestUserMessage(Input));
             var responseWithoutStream = await _client.GetChatCompletionsAsync(_options);
             var response = responseWithoutStream.Value;
             this.Output = response.Choices.First().Message.Content;

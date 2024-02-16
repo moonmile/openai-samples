@@ -17,13 +17,13 @@ var options = new ChatCompletionsOptions
 {
     Messages =
     {
-      new ChatMessage(ChatRole.System, "小学生に説明するように、やさしい言葉を使ってください。"),
-      // new ChatMessage(ChatRole.System, "大学生の説明するように、難しい言葉を使ってください。"),
-      // new ChatMessage(ChatRole.System, "裁判官の判決文のように、熟語を多く使ってください。"),
-      new ChatMessage(ChatRole.User, "- 猫は可愛い。"),
-      new ChatMessage(ChatRole.User, "- 猫は気まぐれである。"),
-      new ChatMessage(ChatRole.User, "- ロボットは猫になることができる。"),
-      new ChatMessage(ChatRole.User, "これらの箇条書きを400文字位の文章にしてください。"),
+      new ChatRequestSystemMessage("小学生に説明するように、やさしい言葉を使ってください。"),
+      // new ChatRequestSystemMessage("大学生の説明するように、難しい言葉を使ってください。"),
+      // new ChatRequestSystemMessage("裁判官の判決文のように、熟語を多く使ってください。"),
+      new ChatRequestUserMessage ("- 猫は可愛い。"),
+      new ChatRequestUserMessage ("- 猫は気まぐれである。"),
+      new ChatRequestUserMessage("- ロボットは猫になることができる。"),
+      new ChatRequestUserMessage ("これらの箇条書きを400文字位の文章にしてください。"),
     },
     DeploymentName = "model-x",
     MaxTokens = 800,

@@ -18,7 +18,7 @@ var options = new ChatCompletionsOptions
 {
     Messages =
     {
-      new ChatMessage(ChatRole.User, prompt),
+      new ChatRequestUserMessage(prompt),
     },
     DeploymentName = "model-x",
     MaxTokens = 500,

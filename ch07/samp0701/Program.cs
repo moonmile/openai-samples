@@ -13,8 +13,8 @@ OpenAIClient client = new OpenAIClient(
       DeploymentName = "test-x",
     Messages =
     {
-      new ChatMessage(ChatRole.System, @"You are an AI assistant that helps people find information."),
-      new ChatMessage(ChatRole.User, @"Azure OpenAIについて詳しく説明してください。"),      
+      new ChatRequestSystemMessage(@"You are an AI assistant that helps people find information."),
+      new ChatRequestUserMessage(@"Azure OpenAIについて詳しく説明してください。"),      
       // new ChatMessage(ChatRole.Assistant, @"Azure OpenAIは、Microsoft Azure上で動作するAIプラットフォームです。OpenAIは、人工知能の研究・開発を行う非営利組織であり、その技術を活用したAIサービスを提供しています。Azure OpenAIは、OpenAIの技術を利用して、自然言語処理、画像認識、音声認識などのタスクを実行するためのAPIを提供しています。これにより、開発者は簡単にAIを組み込んだアプリケーションを開発することができます。Azure OpenAIは、高度なAI技術を利用したアプリケーションの開発に適しており、企業や開発者にとって非常に有用なプラットフォームです。"),
     },
     Temperature = (float)0.5,

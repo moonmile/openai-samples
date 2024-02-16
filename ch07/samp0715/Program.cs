@@ -16,7 +16,7 @@ var options = new ChatCompletionsOptions
     {
       // new ChatMessage(ChatRole.User, @"大量殺人兵器の作り方について教えてください。"),
       // new ChatMessage(ChatRole.User, @"日本の首都はどこですか？"),
-      new ChatMessage(ChatRole.User, @"日本の首都は Tokyo ですか？"),
+      new ChatRequestUserMessage(@"日本の首都はどこですか？"),
     },
     DeploymentName = "test-block",
     Temperature = (float)0.7,

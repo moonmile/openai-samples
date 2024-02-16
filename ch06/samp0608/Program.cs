@@ -15,12 +15,12 @@ var options = new ChatCompletionsOptions
 {
     Messages =
     {
-      new ChatMessage(ChatRole.System, "あなたは大学の先生です。"),
-      new ChatMessage(ChatRole.System, "学生に講義するように話してください。"),
-      new ChatMessage(ChatRole.User, "- 猫は可愛い。"),
-      new ChatMessage(ChatRole.User, "- 猫は気まぐれである。"),
-      new ChatMessage(ChatRole.User, "- ロボットは猫になることができる。"),
-      new ChatMessage(ChatRole.User, "これらの箇条書きを400文字位の文章にしてください。"),
+      new ChatRequestSystemMessage("あなたは大学の先生です。"),
+      new ChatRequestSystemMessage("学生に講義するように話してください。"),
+      new ChatRequestUserMessage("- 猫は可愛い。"),
+      new ChatRequestUserMessage("- 猫は気まぐれである。"),
+      new ChatRequestUserMessage("- ロボットは猫になることができる。"),
+      new ChatRequestUserMessage("これらの箇条書きを400文字位の文章にしてください。"),
     },
     DeploymentName = "model-x",
     MaxTokens = 800,

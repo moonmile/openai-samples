@@ -21,7 +21,7 @@ var options = new ChatCompletionsOptions
 {
     Messages =
     {
-      new ChatMessage(ChatRole.User, prompt),
+      new ChatRequestUserMessage(prompt),
       // プロンプトで指示を追加する
       // new ChatMessage(ChatRole.User, "説明文を100文字程度にしてください。"),
     },

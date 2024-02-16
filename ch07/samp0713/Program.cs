@@ -11,7 +11,7 @@ var client = new OpenAIClient(new Uri(endpoint), credential);
 
 Console.WriteLine("チャットの例");
 // チャットの履歴をためておく
-var messages = new List<ChatMessage>();
+var messages = new List<ChatRequestMessage>();
 
 while( true ) {
     Console.Write("You: ");
@@ -20,7 +20,7 @@ while( true ) {
     {
         break;
     }
-    messages.Add(new ChatMessage(ChatRole.User, prompt));
+    messages.Add(new ChatRequestUserMessage(prompt));
 
     var options = new ChatCompletionsOptions("model-x", messages)
     {
@@ -31,7 +31,7 @@ while( true ) {
     ChatCompletions res = response.Value;
     string result = res.Choices.First().Message.Content;
     Console.WriteLine("AI: " + result);
-    messages.Add(new ChatMessage(ChatRole.Assistant, result));
+    messages.Add(new ChatRequestAssistantMessage(result));
 }
 
 
