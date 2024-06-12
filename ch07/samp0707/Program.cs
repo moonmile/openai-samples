@@ -1,4 +1,58 @@
-﻿using Azure;
+﻿#if true
+
+/**
+ * Semantic Kernel を使った場合
+ */
+
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+
+var builder = Kernel.CreateBuilder();
+builder.AddAzureOpenAIChatCompletion(
+    "test-x",
+    "https://sample-moonmile-openai.openai.azure.com/",
+    Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "");
+var kernel = builder.Build();
+
+Console.WriteLine("文章を要約するプロンプト");
+
+string prompt = """
+次の文章を100文字程度に要約してください。
+
+ある日、豚肉と玉ねぎとじゃがいもは、おいしいカレーを作ることにしました。
+豚肉は元気いっぱいで、「わたしはカレーにピリッとした味を出すのが得意だよ！」と自慢しました。
+玉ねぎはやさしく微笑みながら、「わたしはカレーに甘みをプラスするのが得意だよ！」と言いました。
+じゃがいもはおおらかに、「わたしはカレーにとろりとした食感を出すのが得意だよ！」と言いました。
+そんな３人は、ハンドミキサーを使って材料を混ぜ合わせることにしました。
+豚肉がピリッと、玉ねぎが甘みを、じゃがいもがとろりと、それぞれの得意な味を出すために、みんな力を合わせました。
+そして、カレーの香りがキッチンに広がりました。みんなのお腹はグーグー鳴って、待ちきれません。
+最後に、豚肉と玉ねぎとじゃがいもは、お皿に盛り付けました。
+お箸を持って一口食べると、口の中に広がるおいしい味に、３人は大満足。
+「やったね！おいしいカレーができたよ！」と、３人は喜びました。
+その日の夕飯は、家族みんなで美味しいカレーを楽しみました。
+豚肉も玉ねぎもじゃがいもも、みんなのお腹を満たすおいしいカレーを作ることができて、とっても嬉しかったのです。
+
+要約：
+""";
+
+var kernel_args = new KernelArguments(
+    new OpenAIPromptExecutionSettings()
+    {
+      MaxTokens = 800,
+      Temperature = (float)0.7,
+    });
+
+var result = await kernel.InvokePromptAsync(
+    prompt,
+    kernel_args
+    );
+
+Console.WriteLine(result.GetValue<string>());
+
+
+#else
+
+using Azure;
 using Azure.AI.OpenAI;
 
 // Azure OpenAIサービスのAPIキー
@@ -46,3 +100,4 @@ Response<ChatCompletions> response = await client.GetChatCompletionsAsync(option
 ChatCompletions res = response.Value;
 string result = res.Choices.First().Message.Content;
 Console.WriteLine(result);
+#endif

@@ -1,4 +1,55 @@
-﻿using Azure;
+﻿#if true
+
+/**
+ * Semantic Kernel を使った場合
+ */
+
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+
+var builder = Kernel.CreateBuilder();
+builder.AddAzureOpenAIChatCompletion(
+    "test-x",
+    "https://sample-moonmile-openai.openai.azure.com/",
+    Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "");
+var kernel = builder.Build();
+
+Console.WriteLine("箇条書きからビジネスメールを作成するプロンプト");
+
+string prompt = """
+つぎの文章をビジネスメールに書き換えてください。文字は400文字程度でお願いします。
+
+問い合わせのカレーのレシピを伝える。
+材料は、じゃがいもとにんじんとカレールーと豚肉。
+隠し味に、りんごとバナナを入れる。
+
+・じゃがいもとにんじんは、皮をむいて、一口大に切る。
+・豚肉も同じように一口大に切る。
+・沸騰したら弱火にし、じっくり煮込む。
+・じゃがいもとにんじんが柔らかくなったら、カレールーを加える。
+・すてきなデザインの皿でお楽しみください。
+
+文章：
+""";
+
+var kernel_args = new KernelArguments(
+    new OpenAIPromptExecutionSettings()
+    {
+      MaxTokens = 800,
+      Temperature = (float)0.7,
+    });
+
+var result = await kernel.InvokePromptAsync(
+    prompt,
+    kernel_args
+    );
+
+Console.WriteLine(result.GetValue<string>());
+
+
+#else
+
+using Azure;
 using Azure.AI.OpenAI;
 
 // Azure OpenAIサービスのAPIキー
@@ -43,3 +94,5 @@ Response<ChatCompletions> response = await client.GetChatCompletionsAsync(option
 ChatCompletions res = response.Value;
 string result = res.Choices.First().Message.Content;
 Console.WriteLine(result);
+
+#endif

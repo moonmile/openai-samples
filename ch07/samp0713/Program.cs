@@ -1,4 +1,50 @@
-﻿using Azure;
+﻿#if true
+
+/**
+ * Semantic Kernel を使った場合
+ */
+
+using Azure.AI.OpenAI;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+
+var builder = Kernel.CreateBuilder();
+builder.AddAzureOpenAIChatCompletion(
+    "test-x",
+    "https://sample-moonmile-openai.openai.azure.com/",
+    Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "");
+var kernel = builder.Build();
+
+Console.WriteLine("チャットの例");
+// チャットの履歴をためておく
+var history = new ChatHistory();
+var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+
+while ( true ) {
+    Console.Write("You: ");
+    var prompt = Console.In.ReadLine();
+    if ( string.IsNullOrEmpty(prompt) )
+    {
+        break;
+    }
+    // ユーザーの入力を履歴に追加
+    history.AddUserMessage(prompt);
+
+    var response = await chatCompletionService.GetChatMessageContentAsync(
+                                   history,
+                                   kernel: kernel);
+    // 応答を取得
+    string combinedResponse = response.Items.OfType<TextContent>().FirstOrDefault()?.Text ?? "";
+    Console.WriteLine("AI: " + combinedResponse);
+    // AIの応答を履歴に追加
+    history.AddAssistantMessage(combinedResponse);
+}
+
+#else
+
+
+using Azure;
 using Azure.AI.OpenAI;
 
 // Azure OpenAIサービスのAPIキー
@@ -34,4 +80,4 @@ while( true ) {
     messages.Add(new ChatRequestAssistantMessage(result));
 }
 
-
+#endif

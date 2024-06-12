@@ -1,4 +1,67 @@
-﻿using Azure;
+﻿#if true
+
+/**
+ * Semantic Kernel を使った場合
+ */
+
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+
+var builder = Kernel.CreateBuilder();
+builder.AddAzureOpenAIChatCompletion(
+    "test-x",
+    "https://sample-moonmile-openai.openai.azure.com/",
+    Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "");
+var kernel = builder.Build();
+
+Console.WriteLine("箇条書きからレポートを作成するプロンプト");
+
+string prompt = """
+次の文章をレポート風に書き直してください。
+
+
+テーマ：カレーの隠し味について
+
+目的：
+・一般的なカレーとはちょっと違った味にするレシピを作る。
+
+手順：
+・一般的なカレーの材料を示す（じゃがいもとにんじんとカレールーと豚肉）。
+・隠し味を示す（りんごとバナナ）。
+・材料を切る。
+・材料を煮込む。
+・カレールーを入れて煮込む。
+・隠し味を入れる。
+
+確認：
+・隠し味を入れたときと、入れないときを比較する。
+・味に差があることを確認する。
+・被験者を募集する。
+
+結論：
+・隠し味がうまくいかないこともある。
+
+レポート：
+""";
+
+var kernel_args = new KernelArguments(
+    new OpenAIPromptExecutionSettings()
+    {
+      MaxTokens = 800,
+      Temperature = (float)0.7,
+    });
+
+var result = await kernel.InvokePromptAsync(
+    prompt,
+    kernel_args
+    );
+
+Console.WriteLine(result.GetValue<string>());
+
+
+#else
+
+using Azure;
 using Azure.AI.OpenAI;
 
 // Azure OpenAIサービスのAPIキー
@@ -55,3 +118,5 @@ Response<ChatCompletions> response = await client.GetChatCompletionsAsync(option
 ChatCompletions res = response.Value;
 string result = res.Choices.First().Message.Content;
 Console.WriteLine(result);
+
+#endif

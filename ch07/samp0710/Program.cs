@@ -1,4 +1,53 @@
-﻿using Azure;
+﻿#if true
+
+/**
+ * Semantic Kernel を使った場合
+ */
+
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+
+var builder = Kernel.CreateBuilder();
+builder.AddAzureOpenAIChatCompletion(
+    "test-x",
+    "https://sample-moonmile-openai.openai.azure.com/",
+    Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "");
+var kernel = builder.Build();
+
+Console.WriteLine("文章をですます調に書き換えるプロンプト");
+
+string prompt = """
+つぎの文章を「ですます調」に書き換えてください。
+
+このカレーのレシピでは、じゃがいもとにんじんとカレールーと豚肉を使用する。
+まず、じゃがいもとにんじんは皮をむいて一口大に切る。
+豚肉も同じように一口大に切る。
+鍋にじゃがいもとにんじんと豚肉を入れ、水を加えて火にかける。
+沸騰したら弱火にし、じっくり煮込む。
+じゃがいもとにんじんが柔らかくなったら、カレールーを加える。
+カレールーが溶けたら火を止め、器に盛り付けて完成となる。
+
+文章：
+""";
+
+var kernel_args = new KernelArguments(
+    new OpenAIPromptExecutionSettings()
+    {
+      MaxTokens = 800,
+      Temperature = (float)0.7,
+    });
+
+var result = await kernel.InvokePromptAsync(
+    prompt,
+    kernel_args
+    );
+
+Console.WriteLine(result.GetValue<string>());
+
+
+#else
+
+using Azure;
 using Azure.AI.OpenAI;
 
 // Azure OpenAIサービスのAPIキー
@@ -41,3 +90,5 @@ Response<ChatCompletions> response = await client.GetChatCompletionsAsync(option
 ChatCompletions res = response.Value;
 string result = res.Choices.First().Message.Content;
 Console.WriteLine(result);
+
+#endif

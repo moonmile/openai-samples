@@ -1,4 +1,44 @@
-﻿using Azure;
+﻿#if true
+
+/**
+ * Semantic Kernel を使った場合
+ */
+
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+
+var builder = Kernel.CreateBuilder();
+builder.AddAzureOpenAIChatCompletion(
+    "test-x",
+    "https://sample-moonmile-openai.openai.azure.com/",
+    Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "");
+var kernel = builder.Build();
+
+
+var kernel_args = new KernelArguments(
+    new OpenAIPromptExecutionSettings()
+    {
+        Temperature = (float)1.0,
+        MaxTokens = 800,
+        TopP = (float)0.5,
+        FrequencyPenalty = 0,
+        PresencePenalty = 0,
+    });
+
+var result = await kernel.InvokePromptAsync(
+    """
+    Azure OpenAIについて400文字位で説明してください。    
+    
+    文章：
+    """,
+    kernel_args
+    );
+
+Console.WriteLine(result.GetValue<string>());
+
+
+#else
+using Azure;
 using Azure.AI.OpenAI;
 
 OpenAIClient client = new OpenAIClient(
@@ -20,3 +60,4 @@ Response<Completions> completionsResponse =
     });
 Completions completions = completionsResponse.Value;
 Console.WriteLine(completions.Choices.First().Text);
+#endif
