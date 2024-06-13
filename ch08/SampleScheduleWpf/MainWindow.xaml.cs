@@ -14,7 +14,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Prism.Commands;
 
 namespace SampleScheduleWpf
 {
@@ -33,7 +32,7 @@ namespace SampleScheduleWpf
                 _vm.SendInit();
             };
         }
-        PromptViewModel _vm;
+        PromptViewModel? _vm;
     }
 
 

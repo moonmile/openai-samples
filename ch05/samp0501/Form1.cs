@@ -1,5 +1,5 @@
-using Azure.AI.OpenAI;
-using Azure;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace samp0501
 {
@@ -24,7 +24,7 @@ namespace samp0501
         }
 
         // Azure OpenAIサービスのAPIキー
-        string apiKey = "e2e779b144e440a58d0a831f6821bb9d";
+        string apiKey = Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "";
         // Azure OpenAIサービスのエンドポイント
         string endpoint = "https://sample-moonmile-openai.openai.azure.com/";
 
@@ -77,21 +77,14 @@ namespace samp0501
                 ブログ記事：
                 """;
 
+            var builder = Kernel.CreateBuilder();
+            builder.AddAzureOpenAIChatCompletion("test-x", endpoint, apiKey);
+            var kernel = builder.Build();
 
-            var credential = new AzureKeyCredential(apiKey);
-            var client = new OpenAIClient(new Uri(endpoint), credential);
-            var options = new CompletionsOptions
-            {
-                Prompts = { prompt },
-                DeploymentName = "model-x",
-                MaxTokens = 4000,
-                Temperature = (float)0.7,
-            };
-            Response<Completions> response = await client.GetCompletionsAsync(options);
-            string generatedText = response.Value.Choices[0].Text;
-            string blogPost = generatedText.Trim();
+            var result = await kernel.InvokePromptAsync(prompt);
+            string generatedText = result.GetValue<string>() ?? "";
+            string blogPost = generatedText.Trim().Replace("\n","\r\n");
             textBox6.Text = blogPost;
-
         }
     }
 }

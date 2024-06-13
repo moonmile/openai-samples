@@ -1,35 +1,45 @@
 ﻿using Azure.AI.OpenAI;
 using Azure;
-using Prism.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+using System.Security.Policy;
 
 namespace SampleScheduleWpf
 {
-    public class PromptViewModel : Prism.Mvvm.BindableBase
+    public class PromptViewModel : ObservableObject
     {
-        private const string _apikey = "e448825271654bcf9bfa65e073636924";
-        private const string _url = "https://sample-moonmile-openai-canada.openai.azure.com/";
-        private OpenAIClient _client;
+        private const string _model = "test-x";
+        private string _apikey = Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "";
+        private const string _url = "https://sample-moonmile-openai.openai.azure.com/";
+
+        private Kernel _kernel;
+        private IChatCompletionService _service;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         public PromptViewModel()
         {
-            _client = new OpenAIClient(
-                new Uri(_url),
-                new AzureKeyCredential(_apikey));
+            var builder = Kernel.CreateBuilder();
+            builder.AddAzureOpenAIChatCompletion(
+                _model,
+                _url,
+                _apikey);
+            _kernel = builder.Build();
+            _service = _kernel.GetRequiredService<IChatCompletionService>();
 
-            this.SendCommand = new DelegateCommand(this.Send);
-            this.SaveCommand = new DelegateCommand(this.Save);
+            this.SendCommand = new RelayCommand(this.Send);
+            this.SaveCommand = new RelayCommand(this.Save);
         }
-
-
 
         private string _input = "";
         private string _output = "";
@@ -45,26 +55,19 @@ namespace SampleScheduleWpf
             set { SetProperty(ref _output, value, nameof(Output)); }
         }
 
-        public DelegateCommand SendCommand { get; set; }
-        public DelegateCommand SaveCommand { get; set; }
+        public RelayCommand SendCommand { get; set; }
+        public RelayCommand SaveCommand { get; set; }
 
-        private ChatCompletionsOptions _options;
+        private ChatHistory _history = new ChatHistory();
+
 
         /// <summary>
         /// 最初のプロンプトを送信する
         /// </summary>
         public async void SendInit()
         {
-            _options = new ChatCompletionsOptions()
-            {
-                DeploymentName = "test-x",
-                Temperature = (float)0.5,
-                MaxTokens = 800,
-                NucleusSamplingFactor = (float)0.95,
-                FrequencyPenalty = 0,
-                PresencePenalty = 0,
-            };
-            _options.Messages.Add(new ChatRequestSystemMessage("""
+            _history.AddSystemMessage(
+                """
                 箇条書きで予定表を作ってください。
 
                 予定表のフォーマット：
@@ -80,12 +83,16 @@ namespace SampleScheduleWpf
 
                 予定表を表示してください。
 
-                """));
+                """);
 
-            var responseWithoutStream = await _client.GetChatCompletionsAsync(_options);
-            var response = responseWithoutStream.Value;
-            this.Output = response.Choices.First().Message.Content;
-            _options.Messages.Add(new ChatRequestAssistantMessage(Output));
+            var response = await _service.GetChatMessageContentAsync(
+                                           _history,
+                                           kernel: _kernel);
+            // 応答を取得
+            string combinedResponse = response.Items.OfType<TextContent>().FirstOrDefault()?.Text ?? "";
+            this.Output = combinedResponse;
+            // AIの応答を履歴に追加
+            _history.AddAssistantMessage(combinedResponse);
         }
 
         /// <summary>
@@ -93,11 +100,15 @@ namespace SampleScheduleWpf
         /// </summary>
         public async void Send()
         {
-            _options.Messages.Add(new ChatRequestUserMessage(Input));
-            var responseWithoutStream = await _client.GetChatCompletionsAsync(_options);
-            var response = responseWithoutStream.Value;
-            this.Output = response.Choices.First().Message.Content;
-            _options.Messages.Add(new ChatRequestAssistantMessage(Output));
+            _history.AddUserMessage(Input);
+            var response = await _service.GetChatMessageContentAsync(
+                                           _history,
+                                           kernel: _kernel);
+            // 応答を取得
+            string combinedResponse = response.Items.OfType<TextContent>().FirstOrDefault()?.Text ?? "";
+            this.Output = combinedResponse;
+            // AIの応答を履歴に追加
+            _history.AddAssistantMessage(this.Output);
         }
 
         /// <summary>
@@ -106,7 +117,7 @@ namespace SampleScheduleWpf
         public void Save()
         {
             // ここでは簡便のためメッセージとして表示させる
-            var msg = (_options.Messages.Last() as ChatRequestAssistantMessage)?.Content;
+            var msg = _history.Last()?.Content;
             // 保存ダイアログを開く
             var dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.FileName = "schedule"; 

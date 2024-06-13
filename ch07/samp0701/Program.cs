@@ -26,6 +26,7 @@ var kernel_args = new KernelArguments(
         PresencePenalty = 0,
     });
 
+Console.WriteLine("通常のプロンプト") ;
 var result = await kernel.InvokePromptAsync(
     """
     Azure OpenAIについて詳しく説明してください。

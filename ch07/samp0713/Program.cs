@@ -4,10 +4,8 @@
  * Semantic Kernel を使った場合
  */
 
-using Azure.AI.OpenAI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 var builder = Kernel.CreateBuilder();
 builder.AddAzureOpenAIChatCompletion(
@@ -30,7 +28,6 @@ while ( true ) {
     }
     // ユーザーの入力を履歴に追加
     history.AddUserMessage(prompt);
-
     var response = await chatCompletionService.GetChatMessageContentAsync(
                                    history,
                                    kernel: kernel);
